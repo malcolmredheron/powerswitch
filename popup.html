@@ -18,11 +18,20 @@ img {
   chrome.tabs.getAllInWindow(undefined, function(tabs) {
     console.log('loaded tabs');
     tabs.forEach(function(tab) {
-      console.log('found tab ' + tab.title);
+      var p = document.createElement('p');
+      p.innerText = tab.title;
+      document.body.appendChild(p);
+
+      p.onclick = function(event) {
+        chrome.tabs.update(tab.id, {selected: true});
+      };
+
+//
+//      console.log('found tab ' + tab.title);
     });
-    var text = document.createElement('p');
-    text.innerText = 'done';
-    document.body.appendChild(text);
+//    var text = document.createElement('p');
+//    text.innerText = 'done';
+//    document.body.appendChild(text);
   });
 
 //  var req = new XMLHttpRequest();
