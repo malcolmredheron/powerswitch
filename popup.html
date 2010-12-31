@@ -15,32 +15,21 @@ img {
 
 <script>
   console.log('starting');
-  chrome.tabs.getAllInWindow(undefined, function(tabs) {
+  chrome.windows.getAll({populate: true}, function(windows) {
     console.log('loaded tabs');
-    tabs.forEach(function(tab) {
-      var p = document.createElement('p');
-      p.innerText = tab.title;
-      document.body.appendChild(p);
+    windows.forEach(function(window) {
+      window.tabs.forEach(function(tab) {
+        var p = document.createElement('p');
+        p.innerText = tab.title;
+        document.body.appendChild(p);
 
-      p.onclick = function(event) {
-        chrome.tabs.update(tab.id, {selected: true});
-
-//        chrome.windows.getCurrent(function(window) {
-//          notify('window.type: ' + window.type);
-//        });
-      };
-
-//
-//      console.log('found tab ' + tab.title);
+        p.onclick = function(event) {
+          chrome.extension.getBackgroundPage().notify('click');
+          chrome.tabs.update(tab.id, {selected: true});
+        };
+      });
     });
-//    var text = document.createElement('p');
-//    text.innerText = 'done';
-//    document.body.appendChild(text);
   });
-
-  var notify = function(string) {
-    webkitNotifications.createNotification('', 'notify', string).show();
-  };
 
 //  var req = new XMLHttpRequest();
 //  req.open(
