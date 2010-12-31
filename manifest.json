@@ -7,6 +7,7 @@
     "popup": "popup.html"
   },
   "permissions": [
+    "tabs",
     "http://api.flickr.com/"
   ]
 }
