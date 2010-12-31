@@ -24,6 +24,10 @@ img {
 
       p.onclick = function(event) {
         chrome.tabs.update(tab.id, {selected: true});
+
+//        chrome.windows.getCurrent(function(window) {
+//          notify('window.type: ' + window.type);
+//        });
       };
 
 //
@@ -33,6 +37,10 @@ img {
 //    text.innerText = 'done';
 //    document.body.appendChild(text);
   });
+
+  var notify = function(string) {
+    webkitNotifications.createNotification('', 'notify', string).show();
+  };
 
 //  var req = new XMLHttpRequest();
 //  req.open(

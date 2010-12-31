@@ -8,6 +8,6 @@
   },
   "permissions": [
     "tabs",
-    "http://api.flickr.com/"
+    "notifications"
   ]
 }
