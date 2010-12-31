@@ -62,10 +62,10 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf>
-          <file leaf-file-name="popup.html" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="popup.html" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/popup.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.16464472">
+                <state line="24" column="0" selection-start="206" selection-end="345" vertical-scroll-proportion="0.49913344">
                   <folding />
                 </state>
               </provider>
@@ -75,7 +75,7 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="manifest.json" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="manifest.json" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/manifest.json">
               <provider selected="true" editor-type-id="text-editor">
                 <state line="9" column="9" selection-start="220" selection-end="220" vertical-scroll-proportion="0.18090452">
@@ -88,6 +88,11 @@
       </split-second>
     </splitter>
   </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
   <component name="Git.Settings">
     <option name="GIT_EXECUTABLE" value="/opt/local/bin/git" />
     <option name="CHECKOUT_INCLUDE_TAGS" value="false" />
@@ -96,6 +101,7 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/manifest.json" />
+        <option value="$PROJECT_DIR$/popup.html" />
       </list>
     </option>
   </component>
@@ -286,13 +292,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/popup.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.16464472">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/icon.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -301,6 +300,13 @@
     <entry file="file://$PROJECT_DIR$/manifest.json">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="9" selection-start="220" selection-end="220" vertical-scroll-proportion="0.18090452">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/popup.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="206" selection-end="345" vertical-scroll-proportion="0.49913344">
           <folding />
         </state>
       </provider>
