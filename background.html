@@ -1,7 +1,50 @@
 <html>
+<!--<script src="foo.js"/>-->
+<script src="MochiKit.js"/>
+<!--<script>-->
+  <!--var foo = 5;-->
+<!--</script>-->
 <script>
   var notify = function(string) {
     webkitNotifications.createNotification('', 'notify', string).show();
   };
+
+  var ordered_tabs = [];
+
+  chrome.windows.getAll({populate: true}, function(windows) {
+    windows.forEach(function(window) {
+      window.tabs.forEach(function(tab) {
+        ordered_tabs.push(tab);
+      });
+    });
+  });
+
+  var removeTabWithId = function(tab_id) {
+    for (var i = 0; i < ordered_tabs.length; i++) {
+      var tab = ordered_tabs[i];
+      if (tab_id === tab.id) {
+        ordered_tabs = ordered_tabs.filter(function(tab) {
+          return tab.id !== tab_id;
+        });
+        return tab;
+      }
+    }
+
+    notify('tab not found: ' + tab_id);
+    debugger;
+  };
+
+  chrome.tabs.onCreated.addListener(function(tab) {
+    ordered_tabs = concat([tab], ordered_tabs);
+  });
+
+  chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
+    removeTabWithId(tab_id);
+  });
+
+  chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
+    var tab = removeTabWithId(tab_id);
+    ordered_tabs = concat([tab], ordered_tabs);
+  });
 </script>
 </html>
