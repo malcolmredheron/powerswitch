@@ -11,6 +11,13 @@
 
   var ordered_tabs = [];
 
+  chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.windows.create({
+      url: "popup.html",
+      type: "popup"
+    });
+  });
+
   chrome.windows.getAll({populate: true}, function(windows) {
     windows.forEach(function(window) {
       window.tabs.forEach(function(tab) {

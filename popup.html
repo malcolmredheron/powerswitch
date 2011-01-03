@@ -22,8 +22,10 @@ img {
 
       document.body.appendChild(p);
       p.onclick = function(event) {
-//        background.notify('click');
-        chrome.tabs.update(tab.id, {selected: true});
+        chrome.windows.getCurrent(function(window) {
+          chrome.tabs.update(tab.id, {selected: true});
+          chrome.windows.remove(window.id);
+        });
       };
     });
   }, 1);
