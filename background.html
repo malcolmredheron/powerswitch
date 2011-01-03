@@ -11,12 +11,26 @@
 
   var ordered_tabs = [];
 
-  chrome.browserAction.onClicked.addListener(function(tab) {
+  var showPopup = function() {
     chrome.windows.create({
       url: "popup.html",
       type: "popup"
     });
+  };
+
+  chrome.browserAction.onClicked.addListener(function(tab) {
+    showPopup();
   });
+
+  chrome.extension.onRequest.addListener(
+          function(request, sender, sendResponse) {
+            if (request.action === 'showPopup') {
+              showPopup();
+            } else {
+              debugger;
+            }
+            sendResponse({});
+          });
 
   chrome.windows.getAll({populate: true}, function(windows) {
     windows.forEach(function(window) {
