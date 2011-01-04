@@ -13,14 +13,23 @@ img {
 }
 </style>
 
+<body>
+  <input id="input"/>
+  <div id="tabs_list">
+
+  </div>
+</body>
+
 <script>
   var background = chrome.extension.getBackgroundPage();
   setTimeout(function() {
+    debugger;
+    var tabs_list_div = document.getElementById('tabs_list');
     background.ordered_tabs.forEach(function(tab) {
       var p = document.createElement('p');
       p.innerText = tab.title;
 
-      document.body.appendChild(p);
+      tabs_list_div.appendChild(p);
       p.onclick = function(event) {
         chrome.windows.getCurrent(function(window) {
           chrome.tabs.update(tab.id, {selected: true});
@@ -28,6 +37,7 @@ img {
         });
       };
     });
+    document.getElementById("input").focus();
   }, 1);
 
 </script>
