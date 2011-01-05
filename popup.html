@@ -69,10 +69,11 @@
     console.log('updateAndDisplayMatchingTabs');
     var tabs_list_div = document.getElementById('tabs_list');
 
-    tabs_list_div.innerHTML = "";
     var filter_text = input.value.toLowerCase();
 
     chrome.tabs.getCurrent(function(this_tab) {
+      tabs_list_div.innerHTML = "";
+
       var shouldShowTab = function(tab) {
         return tab.title.toLowerCase().indexOf(filter_text) !== -1;
       };
