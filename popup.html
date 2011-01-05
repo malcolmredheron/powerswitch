@@ -1,16 +1,20 @@
 <style>
-body {
-  min-width:357px;
-  overflow-x:hidden;
-}
+  body {
+    min-width:357px;
+    overflow-x:hidden;
+  }
 
-img {
-  margin:5px;
-  border:2px solid black;
-  vertical-align:middle;
-  width:75px;
-  height:75px;
-}
+  img {
+    margin:5px;
+    border:2px solid black;
+    vertical-align:middle;
+    width:75px;
+    height:75px;
+  }
+
+  .tab.selected {
+    background-color: #ff00ff
+  }
 </style>
 
 <body>
@@ -23,22 +27,58 @@ img {
 <script>
   var background = chrome.extension.getBackgroundPage();
 
+  var selected_index = 2;
+
+  var input = document.getElementById("input");
+  var onKeyPress = function(event) {
+    console.log('onKeyPress');
+
+    var is_up_or_down = false;
+    if (event.keyCode === 38) { // up
+      if (selected_index > 0) {
+        selected_index--;
+      }
+      is_up_or_down = true;
+    } else if (event.keyCode === 40) { // down
+      if (selected_index + 1 < 5) {
+        selected_index++;
+      }
+      is_up_or_down = true;
+    }
+
+    if (is_up_or_down) {
+      displayMatchingTabs();
+      event.stopPropagation();
+      event.preventDefault();
+    }
+  };
+  input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
+  input.autocomplete = 'off';
+
   var displayMatchingTabs = function() {
-    var input = document.getElementById("input");
+    console.log('displayMatchingTabs');
     var tabs_list_div = document.getElementById('tabs_list');
 
     tabs_list_div.innerHTML = "";
     var filter_text = input.value.toLowerCase();
-    background.ordered_tabs.forEach(function(tab) {
+
+    background.ordered_tabs.forEach(function(tab, tab_index) {
       if (tab.title.toLowerCase().indexOf(filter_text) === -1) {
         return;
       }
 
-      var p = document.createElement('p');
-      p.innerText = tab.title;
+      var rendered_tab = document.createElement('div');
+      rendered_tab.innerText = tab.title;
 
-      tabs_list_div.appendChild(p);
-      p.onclick = function(event) {
+      var class_value = 'tab';
+      if (tab_index === selected_index) {
+        class_value += ' selected';
+      }
+      rendered_tab.className = class_value;
+//      console.log(tab.title + ', ' + tab_index + ', ' + class_value);
+
+      tabs_list_div.appendChild(rendered_tab);
+      rendered_tab.onclick = function(event) {
         chrome.windows.getCurrent(function(window) {
           chrome.tabs.update(tab.id, {selected: true});
           chrome.windows.remove(window.id);
