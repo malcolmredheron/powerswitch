@@ -72,20 +72,29 @@
     tabs_list_div.innerHTML = "";
     var filter_text = input.value.toLowerCase();
 
-    chrome.tabs.getCurrent(function(current_tab) {
-      console.log('current_tab ' + current_tab);
-      matching_tabs = [];
-      background.ordered_tabs.forEach(function(tab) {
-        if (tab.title.toLowerCase().indexOf(filter_text) === -1 ||
-                tab.id === current_tab.id) {
-          return;
-        }
-        var tab_index = matching_tabs.length;
-        console.log('tab ' + current_tab);
+    chrome.tabs.getCurrent(function(this_tab) {
+      var shouldShowTab = function(tab) {
+        return tab.title.toLowerCase().indexOf(filter_text) !== -1;
+      };
 
-        matching_tabs.push(tab);
+      var other_tabs = background.ordered_tabs.filter(function(tab) {
+        return tab.id !== this_tab.id;
+      });
+
+      if (other_tabs.length > 0) {
+        other_tabs.push(other_tabs[0]);
+        other_tabs = other_tabs.slice(1);
+      }
+
+      matching_tabs = other_tabs.filter(function(tab) {
+        return shouldShowTab(tab);
+      });
+
+      matching_tabs.forEach(function(tab, tab_index) {
+        console.log('tab ' + this_tab);
+
         var rendered_tab = document.createElement('div');
-        rendered_tab.innerText = tab.title + '###' + tab.url;
+        rendered_tab.innerText = tab.title;
 
         var class_value = 'tab';
         if (tab_index === selected_index) {
