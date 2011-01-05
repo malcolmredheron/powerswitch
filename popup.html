@@ -45,6 +45,8 @@
         selected_index++;
       }
       is_up_or_down = true;
+    } else if (event.keyCode === 13) {
+      selectTab(matching_tabs[selected_index]);
     }
 
     if (is_up_or_down) {
@@ -55,6 +57,13 @@
   };
   input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
   input.autocomplete = 'off';
+
+  var selectTab = function(tab) {
+    chrome.windows.getCurrent(function(window) {
+      chrome.tabs.update(tab.id, {selected: true});
+      chrome.windows.remove(window.id);
+    });
+  };
 
   var updateAndDisplayMatchingTabs = function() {
     console.log('updateAndDisplayMatchingTabs');
@@ -87,10 +96,7 @@
 
         tabs_list_div.appendChild(rendered_tab);
         rendered_tab.onclick = function(event) {
-          chrome.windows.getCurrent(function(window) {
-            chrome.tabs.update(tab.id, {selected: true});
-            chrome.windows.remove(window.id);
-          });
+          selectTab(tab);
         };
       });
     });
