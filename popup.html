@@ -22,10 +22,18 @@ img {
 
 <script>
   var background = chrome.extension.getBackgroundPage();
-  setTimeout(function() {
-    debugger;
+
+  var displayMatchingTabs = function() {
+    var input = document.getElementById("input");
     var tabs_list_div = document.getElementById('tabs_list');
+
+    tabs_list_div.innerHTML = "";
+    var filter_text = input.value.toLowerCase();
     background.ordered_tabs.forEach(function(tab) {
+      if (tab.title.toLowerCase().indexOf(filter_text) === -1) {
+        return;
+      }
+
       var p = document.createElement('p');
       p.innerText = tab.title;
 
@@ -37,7 +45,15 @@ img {
         });
       };
     });
-    document.getElementById("input").focus();
+  };
+
+  setTimeout(function() {
+    displayMatchingTabs();
+    var input = document.getElementById("input");
+    input.focus();
+    input.addEventListener("input", function(event) {
+      displayMatchingTabs();
+    }, /*useCapture=*/ false);
   }, 1);
 
 </script>
