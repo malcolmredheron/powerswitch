@@ -88,6 +88,8 @@
 
         var other_tabs = background.ordered_tabs.filter(function(tab) {
           return tab.id !== this_tab.id;
+        }).map(function(tab) {
+          return current_tab_map[tab.id];
         });
 
         if (other_tabs.length > 0) {
