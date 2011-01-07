@@ -46,7 +46,7 @@
       }
       is_up_or_down = true;
     } else if (event.keyCode === 13) {
-      selectTab(matching_tabs[selected_index]);
+      selectTab(matching_tabs[selected_index].id);
     }
 
     if (is_up_or_down) {
@@ -58,9 +58,9 @@
   input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
   input.autocomplete = 'off';
 
-  var selectTab = function(tab) {
+  var selectTab = function(tab_id) {
     chrome.windows.getCurrent(function(window) {
-      chrome.tabs.update(tab.id, {selected: true});
+      chrome.tabs.update(tab_id, {selected: true});
       chrome.windows.remove(window.id);
     });
   };
@@ -72,40 +72,50 @@
     var filter_text = input.value.toLowerCase();
 
     chrome.tabs.getCurrent(function(this_tab) {
-      tabs_list_div.innerHTML = "";
+      chrome.windows.getAll({populate: true}, function(windows) {
+        var current_tab_map = {};
+        windows.forEach(function(window) {
+          window.tabs.forEach(function(tab) {
+            current_tab_map[tab.id] = tab;
+          });
+        });
 
-      var shouldShowTab = function(tab) {
-        return tab.title.toLowerCase().indexOf(filter_text) !== -1;
-      };
-
-      var other_tabs = background.ordered_tabs.filter(function(tab) {
-        return tab.id !== this_tab.id;
-      });
-
-      if (other_tabs.length > 0) {
-        other_tabs.push(other_tabs[0]);
-        other_tabs = other_tabs.slice(1);
-      }
-
-      matching_tabs = other_tabs.filter(function(tab) {
-        return shouldShowTab(tab);
-      });
-
-      matching_tabs.forEach(function(tab, tab_index) {
-        var rendered_tab = document.createElement('div');
-        rendered_tab.innerText = tab.title;
-
-        var class_value = 'tab';
-        if (tab_index === selected_index) {
-          class_value += ' selected';
-        }
-        rendered_tab.className = class_value;
-        console.log(tab.title + ', ' + tab_index + ', ' + tab.url);
-
-        tabs_list_div.appendChild(rendered_tab);
-        rendered_tab.onclick = function(event) {
-          selectTab(tab);
+        tabs_list_div.innerHTML = "";
+  
+        var shouldShowTab = function(tab) {
+          return tab.title.toLowerCase().indexOf(filter_text) !== -1;
         };
+
+        var other_tabs = background.ordered_tabs.filter(function(tab) {
+          return tab.id !== this_tab.id;
+        });
+
+        if (other_tabs.length > 0) {
+          other_tabs.push(other_tabs[0]);
+          other_tabs = other_tabs.slice(1);
+        }
+
+        matching_tabs = other_tabs.filter(function(tab) {
+          return shouldShowTab(tab);
+        });
+
+        matching_tabs.forEach(function(old_tab, tab_index) {
+          var tab = current_tab_map[old_tab.id];
+          var rendered_tab = document.createElement('div');
+          rendered_tab.innerText = tab.title;
+
+          var class_value = 'tab';
+          if (tab_index === selected_index) {
+            class_value += ' selected';
+          }
+          rendered_tab.className = class_value;
+          console.log(tab.title + ', ' + tab_index + ', ' + tab.url);
+
+          tabs_list_div.appendChild(rendered_tab);
+          rendered_tab.onclick = function(event) {
+            selectTab(tab.id);
+          };
+        });
       });
     });
   };
