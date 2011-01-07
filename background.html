@@ -11,6 +11,7 @@
   // - shortcut in gmail
   // - stack is not always correct (reader)
   // - okc windows (from gmail links) do not appear
+  // - windows do not change names
 
   var notify = function(string) {
     webkitNotifications.createNotification('', 'notify', string).show();
@@ -19,10 +20,8 @@
   var ordered_tabs = [];
 
   var showPopup = function() {
-    chrome.windows.create({
-      url: "popup.html",
-      type: "popup"
-    });
+    window.open(
+            "popup.html", undefined, "location=no,chrome=no,fullscrene=yes");
   };
 
   chrome.browserAction.onClicked.addListener(function(tab) {

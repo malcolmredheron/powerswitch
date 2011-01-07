@@ -92,8 +92,6 @@
       });
 
       matching_tabs.forEach(function(tab, tab_index) {
-        console.log('tab ' + this_tab);
-
         var rendered_tab = document.createElement('div');
         rendered_tab.innerText = tab.title;
 
@@ -102,7 +100,7 @@
           class_value += ' selected';
         }
         rendered_tab.className = class_value;
-//        console.log(tab.title + ', ' + tab_index + ', ' + class_value);
+        console.log(tab.title + ', ' + tab_index + ', ' + tab.url);
 
         tabs_list_div.appendChild(rendered_tab);
         rendered_tab.onclick = function(event) {
