@@ -41,19 +41,19 @@
   chrome.windows.getAll({populate: true}, function(windows) {
     windows.forEach(function(window) {
       window.tabs.forEach(function(tab) {
-        ordered_tabs.push(tab);
+        ordered_tabs.push(tab.id);
       });
     });
   });
 
   var removeTabWithId = function(tab_id) {
     for (var i = 0; i < ordered_tabs.length; i++) {
-      var tab = ordered_tabs[i];
-      if (tab_id === tab.id) {
-        ordered_tabs = ordered_tabs.filter(function(tab) {
-          return tab.id !== tab_id;
+      var ordered_tab_id = ordered_tabs[i];
+      if (tab_id === ordered_tab_id) {
+        ordered_tabs = ordered_tabs.filter(function(ordered_tab_id) {
+          return ordered_tab_id !== tab_id;
         });
-        return tab;
+        return tab_id;
       }
     }
 
@@ -62,7 +62,7 @@
   };
 
   chrome.tabs.onCreated.addListener(function(tab) {
-    ordered_tabs = concat([tab], ordered_tabs);
+    ordered_tabs = concat([tab.id], ordered_tabs);
   });
 
   chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
@@ -70,8 +70,8 @@
   });
 
   chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
-    var tab = removeTabWithId(tab_id);
-    ordered_tabs = concat([tab], ordered_tabs);
+    var tab_id = removeTabWithId(tab_id);
+    ordered_tabs = concat([tab_id], ordered_tabs);
   });
 </script>
 </html>
