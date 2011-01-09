@@ -6,4 +6,4 @@ var onKeyPress = function(event) {
     chrome.extension.sendRequest({action: "showPopup"});
   }
 };
-document.body.addEventListener('keydown', onKeyPress, /*useCapture=*/ true);
+document.addEventListener('keydown', onKeyPress, /*useCapture=*/ true);
