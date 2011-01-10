@@ -8,9 +8,7 @@
   // TODO:
   // - prettier window (fullscreen?)
   // - prettier window contents
-  // - shortcut in gmail
   // - stack is not always correct (reader)
-  // - okc windows (from gmail links) do not appear
   // - see incognito windows
 
   var notify = function(string) {
@@ -62,14 +60,17 @@
   };
 
   chrome.tabs.onCreated.addListener(function(tab) {
+//    notify('onCreated');
     ordered_tabs = concat([tab.id], ordered_tabs);
   });
 
   chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
+//    notify('onRemoved');
     removeTabWithId(tab_id);
   });
 
   chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
+//    notify('onSelectionChanged');
     var tab_id = removeTabWithId(tab_id);
     ordered_tabs = concat([tab_id], ordered_tabs);
   });
