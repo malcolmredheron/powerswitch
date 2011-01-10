@@ -45,13 +45,14 @@
   });
 
   var removeTabWithId = function(tab_id) {
+    // xcxc simplify
     for (var i = 0; i < ordered_tabs.length; i++) {
       var ordered_tab_id = ordered_tabs[i];
       if (tab_id === ordered_tab_id) {
         ordered_tabs = ordered_tabs.filter(function(ordered_tab_id) {
           return ordered_tab_id !== tab_id;
         });
-        return tab_id;
+        return;
       }
     }
 
@@ -71,7 +72,7 @@
 
   chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
 //    notify('onSelectionChanged');
-    var tab_id = removeTabWithId(tab_id);
+    removeTabWithId(tab_id);
     ordered_tabs = concat([tab_id], ordered_tabs);
   });
 </script>
