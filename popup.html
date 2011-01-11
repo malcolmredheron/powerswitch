@@ -5,11 +5,12 @@
   }
 
   img {
-    margin:5px;
-    border:2px solid black;
-    vertical-align:middle;
-    width:75px;
-    height:75px;
+    width:16px;
+    height:16px;
+  }
+
+  img[src=''] {
+    visibility: hidden;
   }
 
   .tab.selected {
@@ -103,18 +104,22 @@
 
         matching_tabs.forEach(function(old_tab, tab_index) {
           var tab = current_tab_map[old_tab.id];
-          var rendered_tab = document.createElement('div');
-          rendered_tab.innerText = tab.title;
+          var tab_div = document.createElement('div');
+          var icon_img = document.createElement('img');
+          icon_img.src = tab.favIconUrl ? tab.favIconUrl : '';
+          var name_span = document.createElement('span');
+          name_span.innerText = tab.title;
+          tab_div.appendChild(icon_img);
+          tab_div.appendChild(name_span);
 
           var class_value = 'tab';
           if (tab_index === selected_index) {
             class_value += ' selected';
           }
-          rendered_tab.className = class_value;
-          console.log(tab.title + ', ' + tab_index + ', ' + tab.url);
+          tab_div.className = class_value;
 
-          tabs_list_div.appendChild(rendered_tab);
-          rendered_tab.onclick = function(event) {
+          tabs_list_div.appendChild(tab_div);
+          tab_div.onclick = function(event) {
             selectTab(tab.id);
           };
         });
