@@ -15,7 +15,7 @@
     webkitNotifications.createNotification('', 'notify', string).show();
   };
 
-  var ordered_tabs = [];
+  var ordered_tabs = []; // xcxc rename
 
   var showPopup = function() {
     window.open(
@@ -71,9 +71,15 @@
   });
 
   chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
-//    notify('onSelectionChanged');
     removeTabWithId(tab_id);
     ordered_tabs = concat([tab_id], ordered_tabs);
+  });
+
+  chrome.windows.onFocusChanged.addListener(function(window) {
+    chrome.tabs.getSelected(undefined, function(tab) {
+      removeTabWithId(tab.id);
+      ordered_tabs = concat([tab.id], ordered_tabs);
+    });
   });
 </script>
 </html>
