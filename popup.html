@@ -2,19 +2,45 @@
   body {
     min-width:357px;
     overflow-x:hidden;
+    margin: 100px;
   }
 
-  img {
-    width:16px;
-    height:16px;
+  #input {
+    width: 100%;
   }
 
-  img[src=''] {
-    visibility: hidden;
+  #tabs_list {
+    padding-top:10px;
+  }
+
+  .tab {
+    padding:2px 20px;
+    border-width: 2px;
+    border-style:solid;
+    border-color:#FFF;
+    -webkit-border-radius: 8px;
   }
 
   .tab.selected {
-    background-color: #ff00ff
+    background-color: #cccccc;
+    border-style:solid;
+    border-color:#000;
+  }
+
+  .tab img {
+    width:16px;
+    height:16px;
+    padding-right: 4px;
+  }
+
+  .tab img[src=''] {
+    visibility: hidden;
+  }
+
+  .tab .name {
+    font-size: 20px;
+    font-family:Gill Sans;
+    /*font-weight:bold;*/
   }
 </style>
 
@@ -109,6 +135,7 @@
           icon_img.src = tab.favIconUrl ? tab.favIconUrl : '';
           var name_span = document.createElement('span');
           name_span.innerText = tab.title;
+          name_span.className = 'name';
           tab_div.appendChild(icon_img);
           tab_div.appendChild(name_span);
 
