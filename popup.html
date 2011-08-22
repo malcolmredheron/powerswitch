@@ -72,8 +72,12 @@
         selected_index++;
       }
       is_up_or_down = true;
-    } else if (event.keyCode === 13) {
+    } else if (event.keyCode === 13) { // enter
       selectTab(matching_tabs[selected_index].id);
+    } else if (event.keyCode === 27) { // escape
+      chrome.windows.getCurrent(function(window) {
+       chrome.windows.remove(window.id);
+      });
     }
 
     if (is_up_or_down) {
