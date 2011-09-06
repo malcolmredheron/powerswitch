@@ -15,6 +15,7 @@ var descendentsMatchingXpath = function(parent, xpath) {
 var onKeyPress = function(event) {
   if (event.keyCode === 75 && event.metaKey) { // command-K
     chrome.extension.sendRequest({action: "showPopup"});
+    event.stopPropagation();
   }
 };
 window.addEventListener('keydown', onKeyPress, /*useCapture=*/ true);
@@ -30,7 +31,9 @@ window.addEventListener('keydown', onKeyPress, /*useCapture=*/ true);
 // - http://code.google.com/p/chromium/issues/detail?id=20773
 // - http://blog.afterthedeadline.com/2010/05/14/how-to-jump-through-hoops-and-make-a-chrome-extension/
 var addListenerToIframes = function() {
-  descendentsMatchingXpath(document, '//iframe[not(@src)]').forEach(function(iframe) {
+  descendentsMatchingXpath(document, '//iframe[not(@src)]')
+  .concat(descendentsMatchingXpath(document, '//iframe[starts-with(@src, "javascript:")]'))
+  .forEach(function(iframe) {
       if (iframe.__power_switch_handler_set === undefined) {
         iframe.contentDocument.addEventListener('keydown', onKeyPress, /*useCapture=*/ true);
         iframe.__power_switch_handler_set = true;

@@ -1,6 +1,6 @@
 {
   "name": "PowerSwitch",
-  "version": "2011.1.13",
+  "version": "2011.9.5",
   "description": "Switch tabs by typing",
   "browser_action": {
     "default_icon": "icon.png"
