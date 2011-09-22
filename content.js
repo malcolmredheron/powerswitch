@@ -13,7 +13,7 @@ var descendentsMatchingXpath = function(parent, xpath) {
 };
 
 var onKeyPress = function(event) {
-  if (event.keyCode === 75 && event.metaKey) { // command-K
+  if (event.keyCode === 75 && (event.metaKey || event.ctrlKey)) { // command-K
     chrome.extension.sendRequest({action: "showPopup"});
     event.stopPropagation();
   }
