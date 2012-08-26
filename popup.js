@@ -84,7 +84,7 @@ var updateAndDisplayMatchingTabs = function() {
         var tab_div = document.createElement('div');
         var icon_img = document.createElement('img');
         icon_img.src = tab.favIconUrl ? tab.favIconUrl : '';
-        var name_span = document.createElement('span');
+        var name_span = document.createElement('div');
         name_span.innerText = tab.title;
         name_span.className = 'name';
         tab_div.appendChild(icon_img);
