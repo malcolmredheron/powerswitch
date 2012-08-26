@@ -1,9 +1,5 @@
 <html>
-<!--<script src="foo.js"/>-->
 <script src="MochiKit.js"/>
-<!--<script>-->
-  <!--var foo = 5;-->
-<!--</script>-->
 <script>
   // TODO:
   // - prettier window (fullscreen?)
@@ -18,7 +14,7 @@
 
   var showPopup = function() {
     window.open(
-            "popup.html", undefined, "location=no,chrome=no,fullscrene=yes");
+            "popup.html", undefined, "location=no,chrome=no,fullscreen=yes,resizable=no,height=400,width=850");
   };
 
   chrome.browserAction.onClicked.addListener(function(tab) {
