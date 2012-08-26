@@ -12,7 +12,7 @@
     webkitNotifications.createNotification('', 'notify', string).show();
   };
 
-  var ordered_tabs = []; // xcxc rename
+  var ordered_tab_ids = [];
 
   var showPopup = function() {
     debugger;
@@ -49,17 +49,17 @@
   chrome.windows.getAll({populate: true}, function(windows) {
     windows.forEach(function(window) {
       window.tabs.forEach(function(tab) {
-        ordered_tabs.push(tab.id);
+        ordered_tab_ids.push(tab.id);
       });
     });
   });
 
   var removeTabWithId = function(tab_id) {
     // xcxc simplify
-    for (var i = 0; i < ordered_tabs.length; i++) {
-      var ordered_tab_id = ordered_tabs[i];
+    for (var i = 0; i < ordered_tab_ids.length; i++) {
+      var ordered_tab_id = ordered_tab_ids[i];
       if (tab_id === ordered_tab_id) {
-        ordered_tabs = ordered_tabs.filter(function(ordered_tab_id) {
+        ordered_tab_ids = ordered_tab_ids.filter(function(ordered_tab_id) {
           return ordered_tab_id !== tab_id;
         });
         return;
@@ -72,7 +72,7 @@
 
   chrome.tabs.onCreated.addListener(function(tab) {
 //    notify('onCreated');
-    ordered_tabs = concat([tab.id], ordered_tabs);
+    ordered_tab_ids = concat([tab.id], ordered_tab_ids);
   });
 
   chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
@@ -82,13 +82,13 @@
 
   chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
     removeTabWithId(tab_id);
-    ordered_tabs = concat([tab_id], ordered_tabs);
+    ordered_tab_ids = concat([tab_id], ordered_tab_ids);
   });
 
   chrome.windows.onFocusChanged.addListener(function(window) {
     chrome.tabs.getSelected(undefined, function(tab) {
       removeTabWithId(tab.id);
-      ordered_tabs = concat([tab.id], ordered_tabs);
+      ordered_tab_ids = concat([tab.id], ordered_tab_ids);
     });
   });
 </script>

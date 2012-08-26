@@ -128,7 +128,7 @@
               (tab.url.toLowerCase().indexOf(filter_text) !== -1);
         };
 
-        var other_tabs = background.ordered_tabs.filter(function(tab_id) {
+        var other_tabs = background.ordered_tab_ids.filter(function(tab_id) {
           return tab_id !== this_tab.id;
         }).map(function(tab_id) {
           return current_tab_map[tab_id];
