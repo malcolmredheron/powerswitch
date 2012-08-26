@@ -1,3 +1,6 @@
+/*----------------------------------------------------------------------------*/
+/* General. */
+
 body {
     min-width:357px;
     overflow-x:hidden;
@@ -16,17 +19,6 @@ body {
     height: 100%;
 }
 
-#input {
-    width: 100%;
-    -webkit-border-radius: 15px;
-    padding: 5px;
-    outline: none;
-    font-family:"lucida grande",sans-serif;
-    font-size: 1em;
-    color: #333;
-    border: 1px solid #CCC;
-}
-
 #tabs_list {
     -webkit-box-flex: 1;
     padding-top:10px;
@@ -35,26 +27,65 @@ body {
     overflow-y: scroll;
 }
 
+/*----------------------------------------------------------------------------*/
+/* Tab or whole search area. */
+
+#search-div,
 .tab {
-    padding:5px 5px;
-    border-width: 2px;
     display: -webkit-box;
     -webkit-box-align: center;
+    padding:5px 5px;
+}
+
+#search-div {
+    -webkit-border-radius: 15px;
+    border: 1px solid #CCC;
+    background-color: white;
+}
+
+.tab {
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
 }
 
 .tab.selected {
     background-color: #689FB4;
 }
 
+/*----------------------------------------------------------------------------*/
+/* Icon or spacer. */
+
+#search-div img,
 .tab img {
     width:16px;
     height:16px;
     padding-right: 4px;
-    -webkit-box-flex: 1;
 }
 
+#search-div img,
 .tab img[src=''] {
     visibility: hidden;
+}
+
+/*----------------------------------------------------------------------------*/
+/* Tab name or input. */
+
+#input,
+.tab .name {
+    -webkit-box-flex: 1;
+    margin: 0px;
+    padding: 0px;
+    border: none;
+}
+
+#input {
+    display: block;
+    /*padding: 5px;*/
+    outline: none;
+    font-family:"lucida grande",sans-serif;
+    font-size: 1em;
+    color: #333;
 }
 
 .tab .name {
