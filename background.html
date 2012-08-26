@@ -15,7 +15,6 @@
   var ordered_tab_ids = [];
 
   var showPopup = function() {
-    debugger;
     var window_width = 850;
     var window_height = 400;
     var window_left =
@@ -26,7 +25,7 @@
             window.screen.availTop;
 
     window.open(
-            "popup.html", undefined,
+        "popup.html", undefined,
         "location=no,chrome=no,fullscreen=yes,resizable=no," +
             "height=" + window_height + ",width=" + window_width + "," +
             "top=" + window_top + ",left=" + window_left);
