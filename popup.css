@@ -9,6 +9,13 @@ body {
     width: 0;
 }
 
+#main-ui {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-pack: end;
+    height: 100%;
+}
+
 #input {
     width: 100%;
     -webkit-border-radius: 15px;
@@ -21,9 +28,9 @@ body {
 }
 
 #tabs_list {
+    -webkit-box-flex: 1;
     padding-top:10px;
     color: #e1e1e1;
-    max-height: 300px;
     overflow-x: hidden;
     overflow-y: scroll;
 }
