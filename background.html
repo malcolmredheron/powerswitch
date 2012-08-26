@@ -16,19 +16,20 @@
 
   var showPopup = function() {
     debugger;
-//    var window_width = 850;
-//    var window_height = 400;
-//    var window_left =
-//        (window.screen.availWidth - window_width) / 2 + window.screen.availLeft;
-//    var window_top =
-//        (window.screen.availHeight - window_height) / 2 + window.screen.availTop;
-//    var window_left = 0;
-//    var window_top = 0;
+    var window_width = 850;
+    var window_height = 400;
+    var window_left =
+        (window.screen.availWidth - window_width) / 2 +
+            window.screen.availLeft;
+    var window_top =
+        (window.screen.availHeight - window_height) / 2 +
+            window.screen.availTop;
 
     window.open(
-            "popup.html", undefined, "location=no,chrome=no,fullscreen=yes,resizable=no,height=400,width=850");
-//        "location=no,chrome=no,fullscreen=yes,resizable=no," +
-//            "height=" + window_height + ",width=" + 850);
+            "popup.html", undefined,
+        "location=no,chrome=no,fullscreen=yes,resizable=no," +
+            "height=" + window_height + ",width=" + window_width + "," +
+            "top=" + window_top + ",left=" + window_left);
   };
 
   chrome.browserAction.onClicked.addListener(function(tab) {
