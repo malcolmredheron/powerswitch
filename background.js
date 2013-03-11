@@ -4,7 +4,7 @@
 // - stack is not always correct (reader)
 
 var notify = function(string) {
-  webkitNotifications.createNotification('', 'notify', string).show();
+  //  webkitNotifications.createNotification('', 'notify', string).show();
 };
 
 var ordered_tab_ids = [];

@@ -9,17 +9,14 @@
   "background": {
     "scripts": ["MochiKit.js", "background.js"]
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_start",
-      "all_frames": true
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+K"
+      }
     }
-  ],
-
+  },
   "permissions": [
-    "tabs",
-    "notifications"
+    "tabs"
   ]
 }
