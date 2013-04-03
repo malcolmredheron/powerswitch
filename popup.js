@@ -24,9 +24,7 @@ chrome.tabs.getCurrent(function(this_tab) {
       event.stopPropagation();
       event.preventDefault();
     } else if (event.keyCode === 27) { // escape
-      chrome.windows.getCurrent(function(window) {
-        chrome.windows.remove(window.id);
-      });
+      chrome.tabs.remove(this_tab.id);
     }
 
     if (is_up_or_down) {
@@ -39,8 +37,8 @@ chrome.tabs.getCurrent(function(this_tab) {
   input.autocomplete = 'off';
 
   var selectTab = function(tab_id) {
-      chrome.tabs.remove(this_tab.id);
-      chrome.tabs.update(tab_id, {selected: true});
+    chrome.tabs.update(tab_id, {active: true});
+    chrome.tabs.remove(this_tab.id);
   };
 
   var updateAndDisplayMatchingTabs = function() {

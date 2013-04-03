@@ -30,15 +30,14 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   showPopup();
 });
 
-chrome.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
-      if (request.action === 'showPopup') {
-        showPopup();
-      } else {
-        debugger;
-      }
-      sendResponse({});
-    });
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+  if (request.action === 'showPopup') {
+    showPopup();
+  } else {
+    debugger;
+  }
+  sendResponse({});
+});
 
 chrome.windows.getAll({populate: true}, function(windows) {
   windows.forEach(function(window) {
@@ -61,6 +60,24 @@ var removeTabWithId = function(tab_id) {
   }
 };
 
+var updateOrderedTabsWithCurrentTab = function() {
+  chrome.windows.getLastFocused(function(window) {
+    chrome.tabs.query({
+      active: true,
+      windowId: window.id
+    }, function(tabs) {
+      if (tabs.length > 0) {
+        var tab = tabs[0];
+        notify('current tab is ' + tab.id + ", " + tab.title);
+        // We asked for just active tabs in the current window, so there should be at most one
+        // tab. ("At most" since I guess that the tab/window could be closed by now.)
+        removeTabWithId(tab.id);
+        ordered_tab_ids = concat([tab.id], ordered_tab_ids);
+      }
+    });
+  });
+};
+
 chrome.tabs.onCreated.addListener(function(tab) {
     notify('onCreated ' + tab.id);
   ordered_tab_ids = concat([tab.id], ordered_tab_ids);
@@ -73,15 +90,14 @@ chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
 
 chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
   notify('onSelectionChanged ' + tab_id);
-  removeTabWithId(tab_id);
-  ordered_tab_ids = concat([tab_id], ordered_tab_ids);
+  updateOrderedTabsWithCurrentTab();
 });
 
-chrome.windows.onFocusChanged.addListener(function(window) {
-  chrome.tabs.getSelected(undefined, function(tab) {
-    removeTabWithId(tab.id);
-    ordered_tab_ids = concat([tab.id], ordered_tab_ids);
-  });
+chrome.windows.onFocusChanged.addListener(function(window_id) {
+  notify('onFocusChanged to window ' + window_id);
+  if (window_id !== chrome.windows.WINDOW_ID_NONE) {
+    updateOrderedTabsWithCurrentTab();
+  }
 });
 
 chrome.tabs.onReplaced.addListener(function(added_tab_id, removed_tab_id) {
