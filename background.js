@@ -4,7 +4,7 @@
 // - stack is not always correct (reader)
 
 var notify = function(string) {
-  //  webkitNotifications.createNotification('', 'notify', string).show();
+  console.log(string);
 };
 
 var ordered_tab_ids = [];
@@ -43,38 +43,36 @@ chrome.extension.onRequest.addListener(
 chrome.windows.getAll({populate: true}, function(windows) {
   windows.forEach(function(window) {
     window.tabs.forEach(function(tab) {
+      notify("on startup, found tab " + tab.id + ", " + tab.title);
       ordered_tab_ids.push(tab.id);
     });
   });
 });
 
 var removeTabWithId = function(tab_id) {
-  // xcxc simplify
-  for (var i = 0; i < ordered_tab_ids.length; i++) {
-    var ordered_tab_id = ordered_tab_ids[i];
-    if (tab_id === ordered_tab_id) {
-      ordered_tab_ids = ordered_tab_ids.filter(function(ordered_tab_id) {
-        return ordered_tab_id !== tab_id;
-      });
-      return;
-    }
+  var tab_index = ordered_tab_ids.indexOf(tab_id);
+  if (tab_index === -1) {
+    notify("could not find tab to remove: " + tab_id);
+    debugger;
+  } else {
+    ordered_tab_ids = concat(
+        ordered_tab_ids.slice(0, tab_index),
+        ordered_tab_ids.slice(tab_index + 1));
   }
-
-  notify('tab not found: ' + tab_id);
-  debugger;
 };
 
 chrome.tabs.onCreated.addListener(function(tab) {
-//    notify('onCreated');
+    notify('onCreated ' + tab.id);
   ordered_tab_ids = concat([tab.id], ordered_tab_ids);
 });
 
 chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
-//    notify('onRemoved');
+  notify('onRemoved ' + tab_id);
   removeTabWithId(tab_id);
 });
 
 chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
+  notify('onSelectionChanged ' + tab_id);
   removeTabWithId(tab_id);
   ordered_tab_ids = concat([tab_id], ordered_tab_ids);
 });
@@ -84,4 +82,17 @@ chrome.windows.onFocusChanged.addListener(function(window) {
     removeTabWithId(tab.id);
     ordered_tab_ids = concat([tab.id], ordered_tab_ids);
   });
+});
+
+chrome.tabs.onReplaced.addListener(function(added_tab_id, removed_tab_id) {
+  notify("onReplaced: " + added_tab_id + " replaced " + removed_tab_id);
+  for (var i = 0; i < ordered_tab_ids.length; i++) {
+    var ordered_tab_id = ordered_tab_ids[i];
+    if (removed_tab_id === ordered_tab_id) {
+      ordered_tab_ids[i] = added_tab_id;
+      return;
+    }
+  }
+  notify("did not find tab to remove");
+  debugger;
 });
