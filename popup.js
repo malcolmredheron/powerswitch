@@ -1,54 +1,54 @@
 var background = chrome.extension.getBackgroundPage();
+chrome.tabs.getCurrent(function(this_tab) {
 
-var selected_index = 0;
-var matching_tabs = [];
+  var selected_index = 0;
+  var matching_tabs = [];
 
-var input = document.getElementById("input");
-var onKeyPress = function(event) {
-  console.log('onKeyPress');
+  var input = document.getElementById("input");
+  var onKeyPress = function(event) {
+    console.log('onKeyPress');
 
-  var is_up_or_down = false;
-  if (event.keyCode === 38) { // up
-    if (selected_index > 0) {
-      selected_index--;
+    var is_up_or_down = false;
+    if (event.keyCode === 38) { // up
+      if (selected_index > 0) {
+        selected_index--;
+      }
+      is_up_or_down = true;
+    } else if (event.keyCode === 40) { // down
+      if (selected_index + 1 < matching_tabs.length) {
+        selected_index++;
+      }
+      is_up_or_down = true;
+    } else if (event.keyCode === 13) { // enter
+      selectTab(matching_tabs[selected_index].id);
+      event.stopPropagation();
+      event.preventDefault();
+    } else if (event.keyCode === 27) { // escape
+      chrome.windows.getCurrent(function(window) {
+        chrome.windows.remove(window.id);
+      });
     }
-    is_up_or_down = true;
-  } else if (event.keyCode === 40) { // down
-    if (selected_index + 1 < matching_tabs.length) {
-      selected_index++;
+
+    if (is_up_or_down) {
+      updateAndDisplayMatchingTabs();
+      event.stopPropagation();
+      event.preventDefault();
     }
-    is_up_or_down = true;
-  } else if (event.keyCode === 13) { // enter
-    selectTab(matching_tabs[selected_index].id);
-  } else if (event.keyCode === 27) { // escape
-    chrome.windows.getCurrent(function(window) {
-      chrome.windows.remove(window.id);
-    });
-  }
+  };
+  input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
+  input.autocomplete = 'off';
 
-  if (is_up_or_down) {
-    updateAndDisplayMatchingTabs();
-    event.stopPropagation();
-    event.preventDefault();
-  }
-};
-input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
-input.autocomplete = 'off';
+  var selectTab = function(tab_id) {
+      chrome.tabs.remove(this_tab.id);
+      chrome.tabs.update(tab_id, {selected: true});
+  };
 
-var selectTab = function(tab_id) {
-  chrome.windows.getCurrent(function(window) {
-    chrome.tabs.update(tab_id, {selected: true});
-    chrome.windows.remove(window.id);
-  });
-};
+  var updateAndDisplayMatchingTabs = function() {
+    console.log('updateAndDisplayMatchingTabs');
+    var tabs_list_div = document.getElementById('tabs_list');
 
-var updateAndDisplayMatchingTabs = function() {
-  console.log('updateAndDisplayMatchingTabs');
-  var tabs_list_div = document.getElementById('tabs_list');
+    var filter_text = input.value.toLowerCase();
 
-  var filter_text = input.value.toLowerCase();
-
-  chrome.tabs.getCurrent(function(this_tab) {
     chrome.windows.getAll({populate: true}, function(windows) {
       var current_tab_map = {};
       windows.forEach(function(window) {
@@ -102,15 +102,15 @@ var updateAndDisplayMatchingTabs = function() {
         };
       });
     });
-  });
-};
+  };
 
-setTimeout(function() {
-  updateAndDisplayMatchingTabs();
-  var input = document.getElementById("input");
-  input.focus();
-  input.addEventListener("input", function(event) {
-    selected_index = 0;
+  setTimeout(function() {
     updateAndDisplayMatchingTabs();
-  }, /*useCapture=*/ false);
-}, 1);
+    var input = document.getElementById("input");
+    input.focus();
+    input.addEventListener("input", function(event) {
+      selected_index = 0;
+      updateAndDisplayMatchingTabs();
+    }, /*useCapture=*/ false);
+  }, 1);
+});
