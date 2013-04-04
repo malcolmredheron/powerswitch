@@ -3,17 +3,15 @@
   "name": "PowerSwitch",
   "version": "2013.4.2",
   "description": "Switch tabs by typing",
-  "browser_action": {
-    "default_icon": "icon.png"
-  },
   "background": {
     "scripts": ["MochiKit.js", "background.js"]
   },
   "commands": {
-    "_execute_browser_action": {
+    "switch_tab": {
       "suggested_key": {
         "default": "Ctrl+K"
-      }
+      },
+      "description": "Bring up the tab switcher"
     }
   },
   "permissions": [

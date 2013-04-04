@@ -26,7 +26,7 @@ var showPopup = function() {
           "top=" + window_top + ",left=" + window_left);
 };
 
-chrome.browserAction.onClicked.addListener(function(tab) {
+chrome.commands.onCommand.addListener(function(command) {
   showPopup();
 });
 
