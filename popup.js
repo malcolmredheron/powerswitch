@@ -20,7 +20,7 @@ chrome.tabs.getCurrent(function(this_tab) {
       }
       is_up_or_down = true;
     } else if (event.keyCode === 13) { // enter
-      selectTab(matching_tabs[selected_index].id);
+      selectTab(matching_tabs[selected_index]);
       event.stopPropagation();
       event.preventDefault();
     } else if (event.keyCode === 27) { // escape
@@ -36,8 +36,9 @@ chrome.tabs.getCurrent(function(this_tab) {
   input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
   input.autocomplete = 'off';
 
-  var selectTab = function(tab_id) {
-    chrome.tabs.update(tab_id, {active: true});
+  var selectTab = function(tab) {
+    chrome.tabs.update(tab.id, {active: true});
+    chrome.windows.update(tab.windowId, {focused: true});
     chrome.tabs.remove(this_tab.id);
   };
 
@@ -96,11 +97,21 @@ chrome.tabs.getCurrent(function(this_tab) {
 
         tabs_list_div.appendChild(tab_div);
         tab_div.onclick = function(event) {
-          selectTab(tab.id);
+          selectTab(tab);
         };
       });
     });
   };
+
+//  document.addEventListener("webkitvisibilitychange", function() {
+//    console.log("new visibility: " + document.visibilityState);
+//  }, false);
+//
+//  function handleVisibilityChange(){
+//    debugger;
+//  }
+//  document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
+
 
   setTimeout(function() {
     updateAndDisplayMatchingTabs();
