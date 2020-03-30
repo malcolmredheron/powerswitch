@@ -99,6 +99,9 @@ chrome.tabs.getCurrent(function(this_tab) {
         tab_div.onclick = function(event) {
           selectTab(tab);
         };
+        if (tab_index === selected_index) {
+          tab_div.scrollIntoView();
+        }
       });
     });
   };
