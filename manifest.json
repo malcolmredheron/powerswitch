@@ -1,10 +1,21 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "PowerSwitch",
   "version": "2013.9.21",
   "description": "Switch tabs by typing",
   "background": {
-    "scripts": ["MochiKit.js", "background.js"]
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "permissions": [
+    "tabs",
+    "system.display"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PowerSwitch"
   },
   "commands": {
     "switch_tab": {
@@ -13,8 +24,5 @@
       },
       "description": "Bring up the tab switcher"
     }
-  },
-  "permissions": [
-    "tabs"
-  ]
+  }
 }

@@ -1,114 +1,101 @@
-// TODO:
-// - prettier window (fullscreen?)
-// - prettier window contents
-// - stack is not always correct (reader)
+// background.js (Manifest V3 Service Worker)
 
-var notify = function(string) {
-  console.log(string);
-};
+// This array will keep track of the ordered tab IDs
+let ordered_tab_ids = [];
 
-var ordered_tab_ids = [];
+// Function to show the popup window
+const showPopup = () => {
+    // Use chrome.system.display.getInfo to get screen dimensions
+    chrome.system.display.getInfo((displays) => {
+        if (displays.length > 0) {
+            const display = displays[0]; // Use the primary display
+            const window_width = 850;
+            const window_height = 400;
+            const window_left = (display.workArea.width - window_width) / 2 + display.workArea.left;
+            const window_top = (display.workArea.height - window_height) / 2 + display.workArea.top;
 
-var showPopup = function() {
-  var window_width = 850;
-  var window_height = 400;
-  var window_left =
-      (window.screen.availWidth - window_width) / 2 +
-          window.screen.availLeft;
-  var window_top =
-      (window.screen.availHeight - window_height) / 2 +
-          window.screen.availTop;
-
-  window.open(
-      "popup.html", undefined,
-      "location=no,chrome=no,fullscreen=yes,resizable=no," +
-          "height=" + window_height + ",width=" + window_width + "," +
-          "top=" + window_top + ",left=" + window_left);
-};
-
-chrome.commands.onCommand.addListener(function(command) {
-  showPopup();
-});
-
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'showPopup') {
-    showPopup();
-  } else {
-    debugger;
-  }
-  sendResponse({});
-});
-
-chrome.windows.getAll({populate: true}, function(windows) {
-  windows.forEach(function(window) {
-    window.tabs.forEach(function(tab) {
-      notify("on startup, found tab " + tab.id + ", " + tab.title);
-      ordered_tab_ids.push(tab.id);
+            chrome.windows.create({
+                url: "popup.html",
+                type: "popup",
+                width: window_width,
+                height: window_height,
+                left: Math.floor(window_left),
+                top: Math.floor(window_top),
+            });
+        } else {
+            console.error("No displays found.");
+        }
     });
-  });
-});
-
-var removeTabWithId = function(tab_id) {
-  var tab_index = ordered_tab_ids.indexOf(tab_id);
-  if (tab_index === -1) {
-    notify("could not find tab to remove: " + tab_id);
-    debugger;
-  } else {
-    ordered_tab_ids = concat(
-        ordered_tab_ids.slice(0, tab_index),
-        ordered_tab_ids.slice(tab_index + 1));
-  }
 };
 
-var updateOrderedTabsWithCurrentTab = function() {
-  chrome.windows.getLastFocused(function(window) {
-    chrome.tabs.query({
-      active: true,
-      windowId: window.id
-    }, function(tabs) {
-      if (tabs.length > 0) {
-        var tab = tabs[0];
-        notify('current tab is ' + tab.id + ", " + tab.title);
-        // We asked for just active tabs in the current window, so there should be at most one
-        // tab. ("At most" since I guess that the tab/window could be closed by now.)
-        removeTabWithId(tab.id);
-        ordered_tab_ids = concat([tab.id], ordered_tab_ids);
-      }
-    });
-  });
-};
-
-chrome.tabs.onCreated.addListener(function(tab) {
-    notify('onCreated ' + tab.id);
-  ordered_tab_ids = concat([tab.id], ordered_tab_ids);
-});
-
-chrome.tabs.onRemoved.addListener(function(tab_id, remove_info) {
-  notify('onRemoved ' + tab_id);
-  removeTabWithId(tab_id);
-});
-
-chrome.tabs.onSelectionChanged.addListener(function(tab_id, select_info) {
-  notify('onSelectionChanged ' + tab_id);
-  updateOrderedTabsWithCurrentTab();
-});
-
-chrome.windows.onFocusChanged.addListener(function(window_id) {
-  notify('onFocusChanged to window ' + window_id);
-  if (window_id !== chrome.windows.WINDOW_ID_NONE) {
-    updateOrderedTabsWithCurrentTab();
-  }
-});
-
-chrome.tabs.onReplaced.addListener(function(added_tab_id, removed_tab_id) {
-  notify("onReplaced: " + added_tab_id + " replaced " + removed_tab_id);
-  for (var i = 0; i < ordered_tab_ids.length; i++) {
-    var ordered_tab_id = ordered_tab_ids[i];
-    if (removed_tab_id === ordered_tab_id) {
-      ordered_tab_ids[i] = added_tab_id;
-      return;
+// Handle command events (e.g., keyboard shortcuts)
+chrome.commands.onCommand.addListener((command) => {
+    if (command === 'switch_tab') {
+        showPopup();
     }
-  }
-  notify("did not find tab to remove");
-  debugger;
+});
+
+// Listen for messages from other parts of the extension
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'showPopup') {
+        showPopup();
+        sendResponse({});
+    } else if (request.action === 'getOrderedTabIds') {
+        sendResponse({ ordered_tab_ids });
+    }
+    return true; // Required to keep the message channel open for asynchronous responses
+});
+
+// On startup, populate the ordered_tab_ids array
+chrome.windows.getAll({ populate: true }).then((windows) => {
+    windows.forEach((window) => {
+        window.tabs.forEach((tab) => {
+            ordered_tab_ids.push(tab.id);
+        });
+    });
+});
+
+// Function to remove a tab by ID from the ordered list
+const removeTabWithId = (tab_id) => {
+    const tab_index = ordered_tab_ids.indexOf(tab_id);
+    if (tab_index !== -1) {
+        ordered_tab_ids.splice(tab_index, 1);
+    }
+};
+
+// Update the ordered tab list when the current tab changes
+const updateOrderedTabsWithCurrentTab = () => {
+    chrome.windows.getLastFocused().then((window) => {
+        chrome.tabs.query({ active: true, windowId: window.id }).then((tabs) => {
+            if (tabs.length > 0) {
+                const tab = tabs[0];
+                removeTabWithId(tab.id);
+                ordered_tab_ids.unshift(tab.id);
+            }
+        });
+    });
+};
+
+// Add event listeners for tab creation, removal, selection changes, and window focus changes
+chrome.tabs.onCreated.addListener((tab) => {
+    ordered_tab_ids.unshift(tab.id);
+});
+
+chrome.tabs.onRemoved.addListener((tab_id) => {
+    removeTabWithId(tab_id);
+});
+
+chrome.tabs.onActivated.addListener(() => {
+    updateOrderedTabsWithCurrentTab();
+});
+
+chrome.windows.onFocusChanged.addListener((window_id) => {
+    if (window_id !== chrome.windows.WINDOW_ID_NONE) {
+        updateOrderedTabsWithCurrentTab();
+    }
+});
+
+chrome.tabs.onReplaced.addListener((added_tab_id, removed_tab_id) => {
+    removeTabWithId(removed_tab_id);
+    ordered_tab_ids.unshift(added_tab_id);
 });

@@ -1,128 +1,113 @@
-var background = chrome.extension.getBackgroundPage();
+// popup.js
+
 chrome.tabs.getCurrent(function(this_tab) {
+    let selected_index = 0;
+    let matching_tabs = [];
 
-  var selected_index = 0;
-  var matching_tabs = [];
+    const input = document.getElementById("input");
 
-  var input = document.getElementById("input");
-  var onKeyPress = function(event) {
-    console.log('onKeyPress');
+    const onKeyPress = (event) => {
+        console.log('onKeyPress');
+        let is_up_or_down = false;
 
-    var is_up_or_down = false;
-    if (event.keyCode === 38) { // up
-      if (selected_index > 0) {
-        selected_index--;
-      }
-      is_up_or_down = true;
-    } else if (event.keyCode === 40) { // down
-      if (selected_index + 1 < matching_tabs.length) {
-        selected_index++;
-      }
-      is_up_or_down = true;
-    } else if (event.keyCode === 13) { // enter
-      selectTab(matching_tabs[selected_index]);
-      event.stopPropagation();
-      event.preventDefault();
-    } else if (event.keyCode === 27) { // escape
-      chrome.tabs.remove(this_tab.id);
-    }
+        if (event.keyCode === 38) { // up arrow
+            if (selected_index > 0) {
+                selected_index--;
+            }
+            is_up_or_down = true;
+        } else if (event.keyCode === 40) { // down arrow
+            if (selected_index + 1 < matching_tabs.length) {
+                selected_index++;
+            }
+            is_up_or_down = true;
+        } else if (event.keyCode === 13) { // enter
+            selectTab(matching_tabs[selected_index]);
+            event.stopPropagation();
+            event.preventDefault();
+        } else if (event.keyCode === 27) { // escape
+            chrome.tabs.remove(this_tab.id);
+        }
 
-    if (is_up_or_down) {
-      updateAndDisplayMatchingTabs();
-      event.stopPropagation();
-      event.preventDefault();
-    }
-  };
-  input.addEventListener('keydown', onKeyPress, /*useCapture=*/ false);
-  input.autocomplete = 'off';
+        if (is_up_or_down) {
+            updateAndDisplayMatchingTabs();
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    };
 
-  var selectTab = function(tab) {
-    chrome.tabs.update(tab.id, {active: true});
-    chrome.windows.update(tab.windowId, {focused: true});
-    chrome.tabs.remove(this_tab.id);
-  };
+    input.addEventListener('keydown', onKeyPress, false);
+    input.autocomplete = 'off';
 
-  var updateAndDisplayMatchingTabs = function() {
-    console.log('updateAndDisplayMatchingTabs');
-    var tabs_list_div = document.getElementById('tabs_list');
+    const selectTab = (tab) => {
+        chrome.tabs.update(tab.id, { active: true });
+        chrome.windows.update(tab.windowId, { focused: true });
+        chrome.tabs.remove(this_tab.id);
+    };
 
-    var filter_text = input.value.toLowerCase();
+    const updateAndDisplayMatchingTabs = () => {
+        console.log('updateAndDisplayMatchingTabs');
+        const tabs_list_div = document.getElementById('tabs_list');
+        const filter_text = input.value.toLowerCase();
 
-    chrome.windows.getAll({populate: true}, function(windows) {
-      var current_tab_map = {};
-      windows.forEach(function(window) {
-        window.tabs.forEach(function(tab) {
-          current_tab_map[tab.id] = tab;
+        // Request ordered_tab_ids from the background script
+        chrome.runtime.sendMessage({ action: 'getOrderedTabIds' }, function(response) {
+            if (!response || !response.ordered_tab_ids) {
+                console.error('Failed to get ordered tabs from background script');
+                return;
+            }
+
+            const ordered_tab_ids = response.ordered_tab_ids;
+
+            chrome.windows.getAll({ populate: true }, function(windows) {
+                const current_tab_map = {};
+                windows.forEach(function(window) {
+                    window.tabs.forEach(function(tab) {
+                        current_tab_map[tab.id] = tab;
+                    });
+                });
+
+                tabs_list_div.innerHTML = "";
+
+                const shouldShowTab = (tab) => {
+                    return tab.title.toLowerCase().includes(filter_text) ||
+                           tab.url.toLowerCase().includes(filter_text);
+                };
+
+                const other_tabs = ordered_tab_ids.filter(tab_id => tab_id !== this_tab.id)
+                                                  .map(tab_id => current_tab_map[tab_id]);
+
+                matching_tabs = other_tabs.filter(tab => shouldShowTab(tab));
+
+                matching_tabs.forEach((old_tab, tab_index) => {
+                    const tab = current_tab_map[old_tab.id];
+                    const tab_div = document.createElement('div');
+                    const icon_img = document.createElement('img');
+                    icon_img.src = tab.favIconUrl || '';
+                    const name_span = document.createElement('div');
+                    name_span.innerText = tab.title;
+                    name_span.className = 'name';
+                    tab_div.appendChild(icon_img);
+                    tab_div.appendChild(name_span);
+
+                    tab_div.className = 'tab' + (tab_index === selected_index ? ' selected' : '');
+                    tabs_list_div.appendChild(tab_div);
+
+                    tab_div.onclick = () => selectTab(tab);
+                    if (tab_index === selected_index) {
+                        tab_div.scrollIntoView();
+                    }
+                });
+            });
         });
-      });
+    };
 
-      tabs_list_div.innerHTML = "";
-
-      var shouldShowTab = function(tab) {
-        return (tab.title.toLowerCase().indexOf(filter_text) !== -1) ||
-            (tab.url.toLowerCase().indexOf(filter_text) !== -1);
-      };
-
-      var other_tabs = background.ordered_tab_ids.filter(function(tab_id) {
-        return tab_id !== this_tab.id;
-      }).map(function(tab_id) {
-            return current_tab_map[tab_id];
-          });
-
-      if (other_tabs.length > 0) {
-        other_tabs.push(other_tabs[0]);
-        other_tabs = other_tabs.slice(1);
-      }
-
-      matching_tabs = other_tabs.filter(function(tab) {
-        return shouldShowTab(tab);
-      });
-
-      matching_tabs.forEach(function(old_tab, tab_index) {
-        var tab = current_tab_map[old_tab.id];
-        var tab_div = document.createElement('div');
-        var icon_img = document.createElement('img');
-        icon_img.src = tab.favIconUrl ? tab.favIconUrl : '';
-        var name_span = document.createElement('div');
-        name_span.innerText = tab.title;
-        name_span.className = 'name';
-        tab_div.appendChild(icon_img);
-        tab_div.appendChild(name_span);
-
-        var class_value = 'tab';
-        if (tab_index === selected_index) {
-          class_value += ' selected';
-        }
-        tab_div.className = class_value;
-
-        tabs_list_div.appendChild(tab_div);
-        tab_div.onclick = function(event) {
-          selectTab(tab);
-        };
-        if (tab_index === selected_index) {
-          tab_div.scrollIntoView();
-        }
-      });
-    });
-  };
-
-//  document.addEventListener("webkitvisibilitychange", function() {
-//    console.log("new visibility: " + document.visibilityState);
-//  }, false);
-//
-//  function handleVisibilityChange(){
-//    debugger;
-//  }
-//  document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
-
-
-  setTimeout(function() {
-    updateAndDisplayMatchingTabs();
-    var input = document.getElementById("input");
-    input.focus();
-    input.addEventListener("input", function(event) {
-      selected_index = 0;
-      updateAndDisplayMatchingTabs();
-    }, /*useCapture=*/ false);
-  }, 1);
+    // Initialize the popup
+    setTimeout(() => {
+        updateAndDisplayMatchingTabs();
+        input.focus();
+        input.addEventListener("input", () => {
+            selected_index = 0;
+            updateAndDisplayMatchingTabs();
+        }, false);
+    }, 1);
 });
