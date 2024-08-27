@@ -23,10 +23,7 @@
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
   </component>
-  <component name="MavenRunner">
-    <option name="jreName" value="1.6" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="Ruby SDK 1.8.6" project-jdk-type="RUBY_SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" project-jdk-name="Ruby SDK 1.8.6" project-jdk-type="RUBY_SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -48,4 +45,3 @@
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
 </project>
-
